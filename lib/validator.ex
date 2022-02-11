@@ -1,6 +1,6 @@
 defmodule Charon.Validator do
   @moduledoc ~S"""
-  Compile time macro that adds support for the `@charon`
+  Compile time macro that adds support for the `@charon_validate`
 
   You shouldn't have to interact with this module directly it is auto included with `use Charon`
   """
@@ -10,7 +10,7 @@ defmodule Charon.Validator do
   def __on_definition__(_env, _access, _name, _args, _guards, nil), do: nil
   def __on_definition__(_env, _access, _name, _args, _guards, []), do: nil
 
-  # When functions are defined that have @charon transform add them to the :charon_functions accumulator
+  # When functions are defined that have @charon_validate transform add them to the :charon_functions accumulator
   def __on_definition__(%{module: module}, access, name, args, guards, do: body) do
     if info = charon_function?(module, name, length(args)) do
       Module.put_attribute(module, :charon_functions, %{
@@ -24,7 +24,7 @@ defmodule Charon.Validator do
       })
 
       Module.put_attribute(module, :charon_last, {name, length(args)})
-      Module.delete_attribute(module, :charon)
+      Module.delete_attribute(module, :charon_validate)
     end
   end
 
@@ -40,10 +40,10 @@ defmodule Charon.Validator do
 
       Logger.warn(
         "[Charon] Unable to wrap `#{inspect(module)}.#{name}/#{length(args)}` " <>
-          "due to additional function-level clauses: #{found} -- please remove @charon"
+          "due to additional function-level clauses: #{found} -- please remove @charon_validate"
       )
 
-      Module.delete_attribute(module, :charon)
+      Module.delete_attribute(module, :charon_validate)
     end
   end
 
@@ -151,7 +151,7 @@ defmodule Charon.Validator do
   For example if you have
 
   ```
-  @charon Validator.Create
+  @charon_validate Validator.Create
   def create(conn, params) do
     <internals>
   end
@@ -164,8 +164,8 @@ defmodule Charon.Validator do
     case apply(Validator.Create, :validate, [conn, params]) do
       %{valid? true} -> <internals>
       %{errors: _errors} = changeset ->
-        error_view = Application.get_env(:charon, :error_view)
-        error_code = Application.get_env(:charon, :error_code, 422)
+        error_view = Application.get_env(:charon_validate, :error_view)
+        error_code = Application.get_env(:charon_validate, :error_code, 422)
         conn |> put_status(error_code) |> put_view(error_view) |> render("error.json", changeset: changeset)
     end
   end
@@ -197,7 +197,8 @@ defmodule Charon.Validator do
       charon_function?(:via_annotation, module) ||
         charon_function?(:via_multiple_heads, module, name, arity)
 
-  def charon_function?(:via_annotation, module), do: Module.get_attribute(module, :charon)
+  def charon_function?(:via_annotation, module),
+    do: Module.get_attribute(module, :charon_validate)
 
   def charon_function?(:via_multiple_heads, module, name, arity) do
     case Module.get_attribute(module, :charon_last) do

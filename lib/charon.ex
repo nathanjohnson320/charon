@@ -24,7 +24,7 @@ defmodule Charon do
   ```
   use Charon
 
-  @charon Validators.NewThing.Create
+  @charon_validate Validators.NewThing.Create
   def create(conn, params) do
   end
   ```
@@ -72,7 +72,7 @@ defmodule Charon do
   function along with our conn and params as arguments. If we provide invalid input it will short circuit and return a validation
   error up front before it hits the inner function body.
 
-  If at any point you want to remove this validation layer all you have to do is drop the @charon tag
+  If at any point you want to remove this validation layer all you have to do is drop the @charon_validate tag
   from your functions, recompile, and it will no longer have that validation.
 
   ## Sample Test case
@@ -101,10 +101,10 @@ defmodule Charon do
 
   * :error_view
     * This is the view module used to render errors. It should be the equivalen MyAppWeb.ChangesetView or compatible renderer.
-    * example: `config :charon, error_view: MyAppWeb.ChangesetView`
+    * example: `config :charon_validate, error_view: MyAppWeb.ChangesetView`
   * :error_code
     * The http status code to return when the validation fails. Defaults to 422
-    * example: `config :charon, error_code: 400`
+    * example: `config :charon_validate, error_code: 400`
   """
   defmacro __using__(_args) do
     quote do
