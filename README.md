@@ -1,6 +1,11 @@
 # Charon
 
-**TODO: Add description**
+## What is this?
+
+Charon is a module attribute that runs a validator before executing the function below.
+
+The goal is to abstract away pre-request validation on phoenix controller functions but there
+might be other use cases for it that I'm not thinking of.
 
 ## Installation
 

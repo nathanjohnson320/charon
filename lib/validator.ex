@@ -172,8 +172,10 @@ defmodule Charon.Validator do
   ```
   """
   def wrapped_function_body(body, _module, _function, [conn | _rest] = args, validator) do
+    safe_args = Enum.filter(args, &unused_args/1)
+
     quote do
-      case apply(unquote(validator), :validate, [unquote_splicing(args)]) do
+      case apply(unquote(validator), :validate, [unquote_splicing(safe_args)]) do
         %{valid?: true} ->
           unquote(body)
 
@@ -189,6 +191,15 @@ defmodule Charon.Validator do
           |> put_view(error_view)
           |> render("error.json", changeset: changeset)
       end
+    end
+  end
+
+  defp unused_args({arg, _, _}) do
+    arg = to_string(arg)
+
+    case arg do
+      <<"_", _rest::binary>> -> false
+      _ -> true
     end
   end
 

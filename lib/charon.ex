@@ -40,6 +40,8 @@ defmodule Charon do
   defmodule Validators.NewThing.Create do
     use Charon.Schema
 
+    alias __MODULE__
+
     @all_fields [:user_id, :list_of_ids]
     @required_fields [:list_of_ids]
 

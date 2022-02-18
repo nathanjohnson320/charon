@@ -19,8 +19,6 @@ defmodule Charon.Schema do
       use Ecto.Schema
 
       import Ecto.Changeset
-
-      alias __MODULE__
     end
   end
 end
