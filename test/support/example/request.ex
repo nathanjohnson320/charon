@@ -1,8 +1,9 @@
-defmodule Test.Support.Validator do
-  use Charon.Schema
+defmodule Test.Support.Example.Request do
+  use Charon.Request
 
   alias __MODULE__
 
+  @status_code 422
   @all_fields [:user_id, :list_of_ids]
   @required_fields [:user_id, :list_of_ids]
 
@@ -12,7 +13,7 @@ defmodule Test.Support.Validator do
   end
 
   def validate(_conn, params) do
-    %Validator{}
+    %Request{}
     |> cast(params, @all_fields)
     |> validate_required(@required_fields)
     |> validate_length(:list_of_ids, min: 1)

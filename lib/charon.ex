@@ -24,7 +24,7 @@ defmodule Charon do
   ```
   use Charon
 
-  @charon_validate Validators.NewThing.Create
+  @charon Validators.NewThing.Create
   def create(conn, params) do
   end
   ```
@@ -74,7 +74,7 @@ defmodule Charon do
   function along with our conn and params as arguments. If we provide invalid input it will short circuit and return a validation
   error up front before it hits the inner function body.
 
-  If at any point you want to remove this validation layer all you have to do is drop the @charon_validate tag
+  If at any point you want to remove this validation layer all you have to do is drop the @charon tag
   from your functions, recompile, and it will no longer have that validation.
 
   ## Sample Test case
@@ -103,21 +103,23 @@ defmodule Charon do
 
   * :error_view
     * This is the view module used to render errors. It should be the equivalen MyAppWeb.ChangesetView or compatible renderer.
-    * example: `config :charon_validate, error_view: MyAppWeb.ChangesetView`
+    * example: `config :charon, error_view: MyAppWeb.ChangesetView`
   * :error_code
     * The http status code to return when the validation fails. Defaults to 422
-    * example: `config :charon_validate, error_code: 400`
+    * example: `config :charon, error_code: 400`
   """
   defmacro __using__(_args) do
     quote do
       require Charon
-      require Charon.Validator
+      require Charon.Request
       # Ensure list of charon functions is accumulated at compile time
       Module.register_attribute(__MODULE__, :charon_functions, accumulate: true)
       # Do not accumulate the last function checked
       Module.register_attribute(__MODULE__, :charon_last, accumulate: false)
-      @before_compile Charon.Validator
-      @on_definition Charon.Validator
+      # Keep track of request status codes
+      Module.register_attribute(__MODULE__, :status_code, accumulate: true)
+      @before_compile Charon.Request
+      @on_definition Charon.Request
     end
   end
 end

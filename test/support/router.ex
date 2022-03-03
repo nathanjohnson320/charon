@@ -1,7 +1,7 @@
 defmodule Test.Support.Router do
   use Charon
 
-  @charon_validate Test.Support.Validator
+  @charon Test.Support.Example
   def create(conn, params) do
     conn |> send_resp(inspect(params))
   end
