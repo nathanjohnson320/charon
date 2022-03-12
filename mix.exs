@@ -27,6 +27,7 @@ defmodule Charon.MixProject do
   defp deps do
     [
       {:ecto_sql, "~> 3.4"},
+      {:plug_cowboy, "~> 2.0"},
       {:ex_doc, "~> 0.27", only: :dev, runtime: false}
     ]
   end
